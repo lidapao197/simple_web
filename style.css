@@ -839,28 +839,21 @@ html[data-theme="dark"] .week-day.selected:not(.today) .wd-num { color: var(--br
   gap: 7px;
   padding: 6px 8px;
   background: var(--chip-bg);
-  border-left: 3px solid var(--brand);
+  /* 红色左边条，与日期条上的红点呼应 */
+  border-left: 3px solid var(--danger);
   border-radius: 9px;
-}
-
-/* 比赛条目用红色左边条，与红点呼应 */
-.agenda-item.is-match {
-  border-left-color: var(--danger);
   /* 一行显示完，不换行 */
   white-space: nowrap;
   overflow: hidden;
 }
 
-.agenda-item.is-match .agenda-main {
+.agenda-main {
+  display: flex;
   flex: 1;
-  flex-direction: row;
   align-items: center;
   gap: 6px;
   min-width: 0;
 }
-
-/* 对阵整体在剩余空间里居中，图标 / 队名 / 比分各列上下对齐 */
-.agenda-item.is-match .match-row { margin: 0 auto; }
 
 /* 赛事说明（赛段 · BO3）紧跟在时间后面，空间不足时先省略它 */
 .agenda-stage {
@@ -873,37 +866,13 @@ html[data-theme="dark"] .week-day.selected:not(.today) .wd-num { color: var(--br
   color: var(--text2);
 }
 
-.agenda-item.is-match .agenda-time { color: var(--danger); }
-
 .agenda-time {
   flex-shrink: 0;
   min-width: 36px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--brand-dark);
+  color: var(--danger);
   font-variant-numeric: tabular-nums;
-}
-
-html[data-theme="dark"] .agenda-time { color: var(--brand); }
-
-.agenda-main {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.agenda-title {
-  font-size: 12.5px;
-  line-height: 1.45;
-  color: var(--text3);
-  word-break: break-word;
-}
-
-.agenda-note {
-  font-size: 11px;
-  line-height: 1.45;
-  color: var(--text2);
 }
 
 /* ---------- 赛程对阵：图标 + 队名 + 比分 ---------- */
@@ -915,6 +884,8 @@ html[data-theme="dark"] .agenda-time { color: var(--brand); }
   flex-wrap: nowrap;
   flex-shrink: 0;
   min-width: 0;
+  /* 对阵整体在剩余空间里居中 */
+  margin: 0 auto;
 }
 
 .team {

@@ -887,14 +887,6 @@ function pickApi(id) {
   loadWeather(true);
 }
 
-function pickCity(id) {
-  if (!cityList().some((c) => c.id === id)) return;
-  weatherCfg.cityId = id;
-  writeWeatherConfig();
-  renderCityList();
-  loadWeather(true);
-}
-
 function removeApi(id) {
   weatherCfg.customApis = weatherCfg.customApis.filter((a) => a.id !== id);
   if (weatherCfg.apiId === id) weatherCfg.apiId = '';
@@ -976,11 +968,10 @@ function bindDrawer() {
     if (opt) pickApi(opt.dataset.apiId);
   });
 
+  /* 城市行只做展示，仅「删除自定义城市」需要处理 */
   $('#cityList').addEventListener('click', (e) => {
     const del = e.target.closest('[data-del-city]');
-    if (del) { removeCity(del.dataset.delCity); return; }
-    const opt = e.target.closest('[data-city-id]');
-    if (opt) pickCity(opt.dataset.cityId);
+    if (del) removeCity(del.dataset.delCity);
   });
 
   // 新增接口
@@ -1540,25 +1531,14 @@ function matchTitle(m) {
   return `${m.a} vs ${m.b}`;
 }
 
-/** 某天是否有内容（手动日程或比赛），用于日期红点 */
+/** 某天是否有比赛，用于日期红点 */
 function hasAgenda(key) {
-  return SCHEDULES.some((it) => it.date === key)
-    || !!(lolMatches[key] && lolMatches[key].length);
+  return !!(lolMatches[key] && lolMatches[key].length);
 }
 
-/** 合并手动日程与当天比赛，按时间升序（无时间视为全天，排最前） */
+/** 当天比赛列表（bucketEvents 已按时间升序排好） */
 function agendaItems(key) {
-  const manual = SCHEDULES
-    .filter((it) => it.date === key)
-    .map((it) => ({
-      kind: 'manual',
-      time: String(it.time || '').trim(),
-      title: it.title.trim(),
-      note: String(it.note || '').trim(),
-    }));
-
-  const matches = (lolMatches[key] || []).map((m) => ({
-    kind: 'match',
+  return (lolMatches[key] || []).map((m) => ({
     time: m.time,
     title: matchTitle(m),
     note: [m.stage, m.mode].filter(Boolean).join(' · '),
@@ -1572,36 +1552,12 @@ function agendaItems(key) {
     sb: m.sb,
     done: m.done,
   }));
-
-  return [...manual, ...matches].sort((a, b) => {
-    if (!a.time && !b.time) return 0;
-    if (!a.time) return -1;
-    if (!b.time) return 1;
-    return a.time.localeCompare(b.time);
-  });
 }
 
 /* =========================================================
-   日历组件：单周日期条 + 当日日程
-   日程数据来自 data/schedule.js
+   日历组件：单周日期条 + 当日日程（数据来自 LoL 赛程）
    ========================================================= */
 const WEEK_LABELS = ['日', '一', '二', '三', '四', '五', '六'];
-
-/** 读取 data/schedule.js 的日程，过滤掉格式不合法的条目 */
-function readSchedules() {
-  const raw = (typeof window !== 'undefined' && window.SCHEDULE_DATA) || {};
-  const items = Array.isArray(raw.items) ? raw.items : [];
-
-  if (!Array.isArray(raw.items)) {
-    console.warn('[起始页] 未读取到 data/schedule.js，日程列表将为空');
-  }
-
-  return items.filter((it) => it
-    && typeof it.title === 'string' && it.title.trim()
-    && typeof it.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(it.date));
-}
-
-const SCHEDULES = readSchedules();
 
 const pad2 = (n) => String(n).padStart(2, '0');
 
@@ -1722,7 +1678,7 @@ function renderAgenda() {
 
   items.forEach((it) => {
     const li = document.createElement('li');
-    li.className = 'agenda-item' + (it.kind === 'match' ? ' is-match' : '');
+    li.className = 'agenda-item';
 
     const time = document.createElement('span');
     time.className = 'agenda-time';
@@ -1731,28 +1687,14 @@ function renderAgenda() {
     const main = document.createElement('span');
     main.className = 'agenda-main';
 
-    if (it.kind === 'match') {
-      /* 比赛行单行排布：时间 · 赛事说明 · 对阵（含图标），不换行 */
-      if (it.note) {
-        const stage = document.createElement('span');
-        stage.className = 'agenda-stage';
-        stage.textContent = it.note;
-        main.appendChild(stage);
-      }
-      main.appendChild(renderMatchRow(it));
-    } else {
-      const title = document.createElement('span');
-      title.className = 'agenda-title';
-      title.textContent = it.title;
-      main.appendChild(title);
-
-      if (it.note) {
-        const note = document.createElement('span');
-        note.className = 'agenda-note';
-        note.textContent = it.note;
-        main.appendChild(note);
-      }
+    /* 单行排布：时间 · 赛事说明 · 对阵（含图标），不换行 */
+    if (it.note) {
+      const stage = document.createElement('span');
+      stage.className = 'agenda-stage';
+      stage.textContent = it.note;
+      main.appendChild(stage);
     }
+    main.appendChild(renderMatchRow(it));
 
     li.append(time, main);
     list.appendChild(li);
