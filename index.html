@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light" data-accent="green">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>起始页</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%238b939e'/><path d='M16 7 26 15.2 26 24.3A1.4 1.4 0 0 1 24.6 25.7L19.5 25.7 19.5 19 12.5 19 12.5 25.7 7.4 25.7A1.4 1.4 0 0 1 6 24.3L6 15.2Z' fill='%23ffffff'/></svg>">
+<!-- 战队图标来自 static.lolesports.com，提前建连省掉一次 DNS + TLS 握手 -->
+<link rel="preconnect" href="https://static.lolesports.com" crossorigin>
+<link rel="dns-prefetch" href="https://static.lolesports.com">
+<!-- v=20261028 用于强制刷新被浏览器缓存的旧样式 -->
+<link rel="stylesheet" href="style.css?v=20261028r">
+</head>
+<body>
+
+<!-- 背景装饰色块：给毛玻璃提供可"磨"的底色 -->
+<div class="bg-blob blob-a"></div>
+<div class="bg-blob blob-b"></div>
+<div class="bg-blob blob-c"></div>
+
+<!-- 右上角：设置与主题 -->
+<div class="topbar">
+  <button class="theme-btn" id="themeBtn" type="button"
+          aria-haspopup="dialog" aria-expanded="false"
+          title="主题与颜色" aria-label="主题与颜色">
+    <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+         stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+      <circle cx="12" cy="12" r="8.4"></circle>
+      <circle cx="9.1" cy="9.6" r="1.35" fill="currentColor" stroke="none"></circle>
+      <circle cx="14.8" cy="9" r="1.35" fill="currentColor" stroke="none"></circle>
+      <circle cx="8.6" cy="14.6" r="1.35" fill="currentColor" stroke="none"></circle>
+    </svg>
+  </button>
+
+  <button class="theme-btn" id="settingsBtn" type="button"
+          aria-haspopup="dialog" aria-expanded="false"
+          title="设置" aria-label="设置">
+    <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+         stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3.1"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+  </button>
+
+  <div class="theme-panel" id="themePanel" role="dialog" aria-label="主题与颜色" hidden>
+    <p class="panel-title">主题颜色</p>
+    <div class="swatches" id="swatches"></div>
+    <div class="panel-divider"></div>
+    <button class="mode-row" id="modeBtn" type="button"
+            role="switch" aria-checked="false" aria-label="深色模式">
+      <span id="modeLabel">深色模式</span>
+      <span class="switch" aria-hidden="true"><span class="knob"></span></span>
+    </button>
+  </div>
+</div>
+
+<main class="stage">
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <div class="engine-select" id="engineSelect">
+      <button type="button" class="engine-btn" id="engineBtn"
+              aria-haspopup="listbox" aria-expanded="false" aria-controls="engineMenu"
+              title="选择搜索引擎">
+        <span id="engineLabel">必应</span>
+        <svg class="chevron" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">
+          <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor"
+                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+      <ul class="engine-menu" id="engineMenu" role="listbox" aria-label="搜索引擎" hidden></ul>
+    </div>
+
+    <span class="divider" aria-hidden="true"></span>
+
+    <input id="searchInput" type="text" placeholder="搜索或输入网址"
+           spellcheck="false" autocapitalize="off" autocorrect="off" aria-label="搜索">
+    <button type="submit" class="go" aria-label="搜索">搜索</button>
+  </form>
+
+  <section class="widgets">
+    <!-- 天气 -->
+    <article class="card weather" id="weatherCard" aria-live="polite">
+      <header class="card-head">
+        <span class="card-title">天气</span>
+        <div class="weather-tools">
+          <button class="weather-city" id="weatherCity" type="button" title="点击更换城市">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <path d="M12 21s-7-5.7-7-11a7 7 0 1 1 14 0c0 5.3-7 11-7 11z"></path>
+              <circle cx="12" cy="10" r="2.6"></circle>
+            </svg>
+            <span id="weatherCityName">未设置</span>
+          </button>
+          <button class="card-tool" id="weatherRefresh" type="button" title="刷新天气" aria-label="刷新天气">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                 stroke-width="2.1" stroke-linecap="round" aria-hidden="true">
+              <path d="M20 12a8 8 0 1 1-2.34-5.66"></path>
+              <path d="M20 4v4h-4"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+      <div class="weather-body" id="weatherBody">
+        <div class="weather-empty">请先在设置中选择城市</div>
+      </div>
+    </article>
+
+    <!-- 日历：单周日期 + 当日日程 -->
+    <article class="card calendar">
+      <header class="card-head">
+        <div class="cal-nav">
+          <button class="card-tool" id="calPrev" type="button" title="上一周" aria-label="上一周">‹</button>
+          <span class="card-title" id="calTitle">—</span>
+          <button class="card-tool" id="calNext" type="button" title="下一周" aria-label="下一周">›</button>
+        </div>
+        <button class="card-tool today-btn" id="calToday" type="button" title="回到今天">今天</button>
+      </header>
+
+      <div class="week-strip" id="weekStrip" role="group" aria-label="本周日期"></div>
+
+      <div class="agenda">
+        <div class="agenda-head" id="agendaHead">—</div>
+        <div class="agenda-body" id="agendaBody"></div>
+      </div>
+    </article>
+
+  </section>
+</main>
+
+<!-- 设置抽屉：天气接口 + 城市 -->
+<div class="drawer-mask" id="drawerMask"></div>
+
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+  <header class="drawer-head">
+    <h2 class="drawer-title" id="drawerTitle">设置</h2>
+    <button class="drawer-close" id="drawerClose" type="button" aria-label="关闭设置">×</button>
+  </header>
+
+  <div class="drawer-body">
+    <section class="drawer-section">
+      <h3>赛事赛程</h3>
+      <p class="drawer-hint">数据来自 Riot 官方赛事接口，已排除云顶之弈等非英雄联盟项目。Key 与语言在 <code>data/lol.js</code> 中配置。</p>
+      <select class="select" id="gameSelect" aria-label="选择赛事">
+        <option value="">正在获取赛事列表…</option>
+      </select>
+      <p class="lol-status" id="lolStatus" role="status"></p>
+    </section>
+
+    <section class="drawer-section">
+      <h3>天气接口</h3>
+      <p class="drawer-hint">选择数据来源。预置接口在 <code>data/weather.js</code> 中维护。</p>
+      <div class="opt-list" id="apiList" role="radiogroup" aria-label="天气接口"></div>
+      <form class="add-form" id="apiForm" autocomplete="off">
+        <input id="apiName" type="text" placeholder="接口名称（可留空）" spellcheck="false">
+        <input id="apiUrl" type="text" placeholder="接口地址 https://..." spellcheck="false">
+        <button type="submit">添加接口</button>
+        <p class="form-msg" id="apiMsg" role="status"></p>
+      </form>
+    </section>
+
+    <section class="drawer-section">
+      <h3>城市</h3>
+      <p class="drawer-hint">这里只显示当前城市。需要更换时，在下方填写城市名称再添加即可。</p>
+      <div class="opt-list" id="cityList" role="radiogroup" aria-label="城市"></div>
+      <form class="add-form" id="cityForm" autocomplete="off">
+        <div class="row2">
+          <input id="cityProvince" type="text" placeholder="省份，如 广东省" spellcheck="false">
+          <input id="cityName" type="text" placeholder="城市，如 广州市" spellcheck="false">
+        </div>
+        <input id="cityDistrict" type="text" placeholder="区 / 县（可选），如 天河区" spellcheck="false">
+        <button type="submit">添加城市</button>
+        <p class="form-msg" id="cityMsg" role="status"></p>
+      </form>
+    </section>
+  </div>
+</aside>
+
+<script src="data/weather.js"></script>
+<script src="data/schedule.js"></script>
+<script src="data/lol.js"></script>
+<script src="app.js?v=20261028r"></script>
+</body>
+</html>
